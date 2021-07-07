@@ -1,21 +1,16 @@
-import java.io.UnsupportedEncodingException;
-import java.security.*;
+
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Random;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+
 
 public class Payment {
 
-    public static  void request (int cardNo, String gbn, String avlYmd, int cvc, int monthlyPay ,int trnsAmt ) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException, ParseException {
+    public static  void request (long cardNo, String gbn, String avlYmd, int cvc, int monthlyPay ,int trnsAmt ) throws Exception {
         
      /*** 헤더를 생성한다 (데이터길이|데이터구분|관리번호) */
         String dataLenth="446" ;
@@ -93,19 +88,14 @@ public class Payment {
         
         HashMap<String, String> rsaKeyPair = encryptDecrypt.createKeypairAsString();
         String publicKey = rsaKeyPair.get("publicKey");
-        
         String privateKey = rsaKeyPair.get("privateKey");
-        KeyPair keyPair = encryptDecrypt.genRSAKeyPair();
-        //PublicKey publicKey = keyPair.getPublic(); 
-        //PrivateKey privateKey = keyPair.getPrivate();
-        //String privateKeysT =  privateKey.toString();
-        //String privateKeysT =  encryptDecrypt.getPrivateKeyFromBase64String(privateKey);
+    
         String encrypted = encryptDecrypt.encode(password,publicKey);
 
-        int encryplen =0 ;
-        encryplen = encrypted.length();
+        //int encryplen =0 ;
+        //encryplen = encrypted.length();
 
-        System.out.println("encryplen 정보 :: " + encryplen);
+        //System.out.println("encryplen 정보 :: " + encryplen);
 
 
         //encryptedTrns = encrypted.substring(1,300);
@@ -121,7 +111,7 @@ public class Payment {
             System.out.println("Sqlite conn!!");
 
             Statement stmt = con.createStatement();
-
+            // 암호화 정보를 저장하기 위한 구문
             ResultSet rs = stmt.executeQuery("INSERT INTO ENCDEC_INFO VALUES ('"+encrypted+"','"+privateKey+"')");
             //rs = stmt.executeQuery("INSERT INTO TRX_INFO VALUES ("+mgntId+","+header+","+data+",DATETIME('now')");
             System.out.println(rs);
@@ -157,7 +147,7 @@ public class Payment {
 
         String trx_header ;
         String trx_data ;
-
+        // 카드사에 전송하기 위한 정보 생성
         trx_header ="{\"dataLen\":\""+dataLenth+"\",\"dataGbn\":\""+dataGbn+"\",\"mgntId\":\""+mgntId+"\"";
 
         trx_data = ",\"cardNoTrns\":\""+cardNoTrns+"\",\"monthlyPayTrns\":\""+monthlyPayTrns+"\"" +
@@ -170,11 +160,11 @@ public class Payment {
         
         JSONParser jsonParser1 = new JSONParser();
         JSONObject jsonObject1;
-        System.out.println("여기0");
+        //System.out.println("여기0");
         jsonObject1 = (JSONObject) jsonParser1.parse(trx);
-        System.out.println("여기1"); 
+        //System.out.println("여기1"); 
 
-        // 결재 요청
+        // 결재 요청(카드사 통신)
         requestApi.callApi(jsonObject1, "POST");
 
         
