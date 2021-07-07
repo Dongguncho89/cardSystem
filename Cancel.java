@@ -1,19 +1,11 @@
-import java.io.UnsupportedEncodingException;
-import java.security.*;
+
 import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.Random;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+
 
 public class Cancel {
-    public static int cardNo;
+    public static long cardNo;
     public static  String gbn;
     public static  String avlYmd;
     public static   int cvc;
@@ -22,7 +14,7 @@ public class Cancel {
     public static   int vat;
     public static  String encrypted; 
 
-    public static  void request (String mgntId ,int canclAmt ) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException, ParseException {
+    public static  void request (String mgntId ,int canclAmt ) throws Exception {
         
         Connection con = null;
         Statement stmt = null;
@@ -50,7 +42,8 @@ public class Cancel {
             System.out.println(rs);
 
             //String mgntId = rs.getString("MGNT_ID");
-            cardNo = rs.getInt("CARD_NO");
+            cardNo = rs.getLong("CARD_NO");
+            
             monthlyPay = 0 ; //rs.getInt("MONTHLY_PAY");
             avlYmd = rs.getString("AVL_END_YMD");
 
@@ -137,7 +130,7 @@ public class Cancel {
             mgntIdTrns = mgntId;
 
         }
-        String password ;
+        //String password ;
 
        
 
